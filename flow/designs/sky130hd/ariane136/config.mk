@@ -20,8 +20,8 @@ export ADDITIONAL_LEFS = $(PLATFORM_DIR)/lef/fakeram130_256x16.lef
 
 export ADDITIONAL_LIBS = $(PLATFORM_DIR)/lib/fakeram130_256x16.lib
 
-export DIE_AREA    = 0 0 3000 3000
-export CORE_AREA   = 10 12 2990 2990
+export DIE_AREA    = 0 0 5000 5000
+export CORE_AREA   = 10 10 4990 4990
 
 export IO_CONSTRAINTS = $(DESIGN_HOME)/$(PLATFORM)/$(DESIGN_NICKNAME)/io.tcl
 
