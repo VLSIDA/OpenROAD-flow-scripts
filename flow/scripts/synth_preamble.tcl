@@ -157,3 +157,52 @@ proc convert_liberty_areas { } {
     rtlil::set_attr -mod -uint $box gate_cost_equivalent $gate_eq
   }
 }
+
+proc connect_clk {cell_name clock_pin_name target_clk_port_name} {
+    # Refer to this GitHub PR for more information on how to get the output of a Yosys command into a
+    # Tcl variable: https://github.com/YosysHQ/yosys/pull/3349
+    tee -q -s cells_to_update_scratchpad select -list c:$cell_name
+    set cells_to_update [scratchpad -copy cells_to_update_scratchpad result.string]
+    set cells_to_update [split $cells_to_update \n]
+
+    # Remove empty element
+    set index [lsearch $cells_to_update ""]
+    set cells_to_update [lreplace $cells_to_update $index $index]
+    set DFF_list [list]
+
+    # Remove the name of the top module from the names of the cells
+    foreach cell $cells_to_update {
+        # How to create a substring: Inspired by this StackOverflow answer:
+        # https://stackoverflow.com/a/15924092
+        lappend DFF_list [string range $cell [expr {[string first "/" $cell]} + 1] end]
+    }
+
+    # Connect clk_2 to the clock port of each cell
+    foreach cell $DFF_list {
+        connect -port $cell $clock_pin_name $target_clk_port_name
+    }
+}
+
+proc check_logical_equivalence {top_module gold gate} {
+    puts "Save a backup that won't get deleted by this function"
+    design -save backup_1
+    
+    # Create new modules
+    design -copy-from $gold -as gold $top_module
+    design -copy-from $gate -as gate $top_module
+
+    equiv_make -inames gold gate equiv
+
+    prep -flatten -top equiv
+    yosys cd equiv
+    opt_clean -purge
+
+    async2sync
+    equiv_simple -undef -short -seq 1
+    equiv_induct -undef -seq 4
+    equiv_status -assert
+
+    puts "Restore the design"
+    design -load backup_1
+}
+

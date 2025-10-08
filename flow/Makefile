@@ -258,9 +258,20 @@ $(SDC_FILE_CLOCK_PERIOD): $(SDC_FILE)
 .PHONY: yosys-dependencies
 yosys-dependencies: $(YOSYS_DEPENDENCIES)
 
+MODE=default
+
 .PHONY: do-yosys
-do-yosys: yosys-dependencies
+do-yosys: $(DONT_USE_SC_LIB)
+ifeq ($(MODE), default)
+	echo "Running default mode"
 	$(SCRIPTS_DIR)/synth.sh $(SYNTH_SCRIPT) $(LOG_DIR)/1_2_yosys.log
+else ifeq ($(MODE), two_phase_clk)
+	echo "Running two-phase clocking with latches mode"
+	$(SCRIPTS_DIR)/synth.sh $(TWO_PHASE_CLK_SYNTH_SCRIPT) $(LOG_DIR)/1_2_yosys.log
+else
+	echo "Mode not recognized. Exiting with error code 1."
+	exit 1
+endif
 
 .PHONY: do-yosys-canonicalize
 do-yosys-canonicalize: yosys-dependencies

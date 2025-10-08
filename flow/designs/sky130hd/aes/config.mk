@@ -3,7 +3,7 @@ export DESIGN_NAME = aes_cipher_top
 export PLATFORM    = sky130hd
 
 export VERILOG_FILES = $(sort $(wildcard $(DESIGN_HOME)/src/$(DESIGN_NICKNAME)/*.v))
-export SDC_FILE      = $(DESIGN_HOME)/$(PLATFORM)/$(DESIGN_NICKNAME)/constraint.sdc
+export SDC_FILE      = $(DESIGN_HOME)/$(PLATFORM)/$(DESIGN_NICKNAME)/two_phase_clk_constraint.sdc
 
 export PLACE_PINS_ARGS = -min_distance 4 -min_distance_in_tracks
 
@@ -20,3 +20,6 @@ export REMOVE_ABC_BUFFERS = 1
 
 export CTS_CLUSTER_SIZE = 20
 export CTS_CLUSTER_DIAMETER = 50
+
+# This allows Yosys to print more details to the terminal during execution
+export YOSYS_FLAGS

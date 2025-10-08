@@ -70,6 +70,10 @@ export TIELO_CELL_AND_PORT = sky130_fd_sc_hd__conb_1 LO
 export MIN_BUF_CELL_AND_PORTS = sky130_fd_sc_hd__buf_4 A X
 
 # Yosys mapping files
+export DUPLICATE_DFFS_MAP_FILE = $(PLATFORM_DIR)/duplicate_DFFs.v
+export DFF_TRANSFORM_MAP_FILE = $(PLATFORM_DIR)/transform_dff.v
+export DFF_TO_LATCH_MAP_FILE = $(PLATFORM_DIR)/dff2latch.v
+
 export LATCH_MAP_FILE = $(PLATFORM_DIR)/cells_latch_hd.v
 export CLKGATE_MAP_FILE = $(PLATFORM_DIR)/cells_clkgate_hd.v
 export ADDER_MAP_FILE ?= $(PLATFORM_DIR)/cells_adders_hd.v
