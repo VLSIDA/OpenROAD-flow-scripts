@@ -44,6 +44,20 @@ timeline
     : DRC/LVS check (KLayout)
 ```
 
+## Running ORFS with two-phase clocking with latches
+
+```
+make DESIGN_CONFIG=./designs/sky130hd/gcd/config.mk .DEFAULT_GOAL=place MODE=two_phase_clk | tee orfs.log
+```
+
+## Running static timing analysis
+
+Inside `openroad`, run the following:
+
+```
+source platforms/sky130hd/specify_files_for_sdc.tcl
+```
+
 ## Tool Installation
 
 There are different ways to install and develop OpenROAD and ORFS, which is the best fit depends use-case, experience and personal taste.

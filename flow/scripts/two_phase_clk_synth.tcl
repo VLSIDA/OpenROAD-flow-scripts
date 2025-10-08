@@ -142,17 +142,12 @@ techmap -autoproc -map $::env(DFF_TO_LATCH_MAP_FILE)
 opt -noff
 
 
-set dfflibmap_args ""
-foreach cell $::env(DONT_USE_CELLS) {
-  lappend dfflibmap_args -dont_use $cell
-}
-
 # Technology mapping of flip-flops
 # dfflibmap only supports one liberty file
 if { [env_var_exists_and_non_empty DFF_LIB_FILE] } {
-  dfflibmap -liberty $::env(DFF_LIB_FILE) {*}$dfflibmap_args
+  dfflibmap -liberty $::env(DFF_LIB_FILE) {*}$lib_dont_use_args
 } else {
-  dfflibmap -liberty $::env(DONT_USE_SC_LIB) {*}$dfflibmap_args
+  dfflibmap {*}$lib_args {*}$lib_dont_use_args
 }
 opt -noff
 
@@ -160,8 +155,10 @@ opt -noff
 setundef -zero
 
 
-if { ![env_var_exists_and_non_empty SYNTH_WRAPPED_OPERATORS] } {
-  puts "Running basic abc"
+if {
+  ![env_var_exists_and_non_empty SYNTH_WRAPPED_OPERATORS] &&
+  ![env_var_exists_and_non_empty SWAP_ARITH_OPERATORS]
+} {
   log_cmd abc {*}$abc_args
 } else {
   scratchpad -set abc9.script $::env(SCRIPTS_DIR)/abc_speed_gia_only.script
@@ -190,11 +187,14 @@ insbuf -buf {*}$::env(MIN_BUF_CELL_AND_PORTS)
 # Reports
 tee -o $::env(REPORTS_DIR)/synth_check.txt check
 
-tee -o $::env(REPORTS_DIR)/synth_stat.txt stat {*}$stat_libs
+tee -o $::env(REPORTS_DIR)/synth_stat.txt stat {*}$lib_args
 
 # check the design is composed exclusively of target cells, and
 # check for other problems
-if { ![env_var_exists_and_non_empty SYNTH_WRAPPED_OPERATORS] } {
+if {
+  ![env_var_exists_and_non_empty SYNTH_WRAPPED_OPERATORS] &&
+  ![env_var_exists_and_non_empty SWAP_ARITH_OPERATORS]
+} {
   check -assert -mapped
 } else {
   # Wrapped operator synthesis leaves around $buf cells which `check -mapped`

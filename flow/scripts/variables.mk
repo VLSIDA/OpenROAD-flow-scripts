@@ -161,6 +161,8 @@ export WRAP_CFG = $(PLATFORM_DIR)/wrapper.cfg
 export TCLLIBPATH := util/cell-veneer $(TCLLIBPATH)
 
 export SYNTH_SCRIPT ?= $(SCRIPTS_DIR)/synth.tcl
+export TWO_PHASE_CLK_SYNTH_SCRIPT ?= $(SCRIPTS_DIR)/two_phase_clk_synth.tcl
+
 export SDC_FILE_CLOCK_PERIOD = $(RESULTS_DIR)/clock_period.txt
 
 export YOSYS_DEPENDENCIES=$(LIB_FILES) $(WRAPPED_LIBS) $(DFF_LIB_FILE) $(VERILOG_FILES) $(SYNTH_NETLIST_FILES) $(LATCH_MAP_FILE) $(ADDER_MAP_FILE) $(SDC_FILE_CLOCK_PERIOD)
