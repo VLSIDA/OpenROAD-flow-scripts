@@ -47,7 +47,7 @@ timeline
 ## Running ORFS with two-phase clocking with latches
 
 ```
-make DESIGN_CONFIG=./designs/sky130hd/gcd/config.mk .DEFAULT_GOAL=place MODE=two_phase_clk | tee orfs.log
+time make DESIGN_CONFIG=./designs/sky130hd/gcd/config.mk .DEFAULT_GOAL=place MODE=two_phase_clk | tee orfs.log
 ```
 
 ## Running static timing analysis
