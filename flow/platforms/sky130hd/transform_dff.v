@@ -31,7 +31,6 @@ module \$_DFFE_PP_
         .Y(mux_output)
     );
 
-    // dlxtp only has a size of 1
     \$_DFF_P_ _TECHMAP_REPLACE_.main_latch (
         .C(C),
         .D(mux_output),
