@@ -91,7 +91,7 @@ renames -wire
 puts "Duplicate each flip-flop"
 techmap -max_iter 1 -map $::env(DUPLICATE_DFFS_MAP_FILE)
 flatten
-opt -noff
+opt
 clean -purge
 
 
@@ -119,27 +119,11 @@ puts "Perform logical equivalence checking"
 check_logical_equivalence $::env(DESIGN_NAME) pre_retiming post_retiming
 
 # Optimize the design
-opt -noff -purge
-
-# Technology mapping of adders
-if { [env_var_exists_and_non_empty ADDER_MAP_FILE] } {
-  # extract the full adders
-  extract_fa
-  # map full adders
-  techmap -map $::env(ADDER_MAP_FILE)
-  techmap
-  # Quick optimization
-  opt -noff -fast -purge
-}
-
-# Technology mapping of latches
-if { [env_var_exists_and_non_empty LATCH_MAP_FILE] } {
-  techmap -map $::env(LATCH_MAP_FILE)
-}
+opt -purge
 
 # puts "Replace each DFF with a corresponding latch"
 techmap -autoproc -map $::env(DFF_TO_LATCH_MAP_FILE)
-opt -noff
+opt
 
 
 # Technology mapping of flip-flops
@@ -149,7 +133,7 @@ if { [env_var_exists_and_non_empty DFF_LIB_FILE] } {
 } else {
   dfflibmap {*}$lib_args {*}$lib_dont_use_args
 }
-opt -noff
+opt
 
 # Replace undef values with defined constants
 setundef -zero
