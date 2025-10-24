@@ -2,9 +2,9 @@
 
 current_design riscv
 
-set clk_period [expr 3 * 6.0]
+set clk_period 6.36
 set clk_io_pct 0.2
-set duty_cycle 0.4
+set duty_cycle 0.49
 
 set clk_1_rise 0.0
 set clk_1_fall [expr {$clk_period * $duty_cycle}]
@@ -49,7 +49,12 @@ create_clock -name $clk_2_name -period $clk_period $clk_2_port -waveform $clk_2_
 
 ############### Create non-clock inputs ###############
 
-set non_clock_inputs [all_inputs -no_clocks]
+set non_clock_inputs [list]
+foreach input [all_inputs] {
+  if { $clk_1_port != $input && $clk_2_port != $input } {
+    lappend $non_clock_inputs $input
+  }
+}
 
 
 ############### Set input and output delays ###############

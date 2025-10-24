@@ -2,9 +2,9 @@
 
 current_design gcd
 
-set clk_period [expr 4 * 1.1]
+set clk_period 3.41
 set clk_io_pct 0.2
-set duty_cycle 0.4
+set duty_cycle 0.49
 
 set clk_1_rise 0.0
 set clk_1_fall [expr {$clk_period * $duty_cycle}]
