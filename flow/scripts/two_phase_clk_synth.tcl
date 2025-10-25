@@ -87,6 +87,8 @@ delete t:\$print
 # At least this is predictable.
 renames -wire
 
+# Optimize the design
+opt -purge
 
 puts "Duplicate each flip-flop"
 techmap -max_iter 1 -map $::env(DUPLICATE_DFFS_MAP_FILE)
@@ -107,6 +109,7 @@ connect_clk *custom_FF_replace_2.mux_latch C clk_1
 connect_clk *custom_FF_replace_1.mux_latch C clk_2
 
 
+design -save post_retiming
 design -save pre_retiming
 
 puts "Perform retiming"
@@ -116,10 +119,7 @@ opt -noff -purge
 design -save post_retiming
 
 puts "Perform logical equivalence checking"
-check_logical_equivalence $::env(DESIGN_NAME) pre_retiming post_retiming
-
-# Optimize the design
-opt -purge
+check_logical_equivalence $::env(DESIGN_NAME) pre_retiming post_retiming $abc_args $lib_args $lib_dont_use_args
 
 # puts "Replace each DFF with a corresponding latch"
 techmap -autoproc -map $::env(DFF_TO_LATCH_MAP_FILE)

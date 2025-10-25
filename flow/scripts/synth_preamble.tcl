@@ -183,18 +183,19 @@ proc connect_clk {cell_name clock_pin_name target_clk_port_name} {
     }
 }
 
-proc check_logical_equivalence {top_module gold gate} {
+proc check_logical_equivalence {top_module gold gate abc_args lib_args lib_dont_use_args} {
     puts "Save a backup that won't get deleted by this function"
     design -save backup_1
     
     # Create new modules
+    
+    #puts "Create new modules"
     design -copy-from $gold -as gold $top_module
     design -copy-from $gate -as gate $top_module
 
     equiv_make -inames gold gate equiv
-
-    prep -flatten -top equiv
     yosys cd equiv
+    prep -flatten -top equiv
     opt_clean -purge
 
     async2sync
