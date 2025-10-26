@@ -215,7 +215,6 @@ proc check_logical_equivalence {top_module gold gate abc_args lib_args lib_dont_
     prep -flatten -top equiv
     opt_clean -purge
 
-    async2sync
     equiv_simple -undef -short -seq 1
     equiv_induct -undef -seq 4
     equiv_status -assert

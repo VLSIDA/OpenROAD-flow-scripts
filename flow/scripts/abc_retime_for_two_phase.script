@@ -1,0 +1,5 @@
+strash
+zero
+dretime -v
+retime -M 5 -D 1 -o -v
+map -D 1
