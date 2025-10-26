@@ -186,15 +186,29 @@ proc connect_clk {cell_name clock_pin_name target_clk_port_name} {
 proc check_logical_equivalence {top_module gold gate abc_args lib_args lib_dont_use_args} {
     puts "Save a backup that won't get deleted by this function"
     design -save backup_1
-    
-    # Create new modules
-    
+
+    design -load $gold
+    abc {*}$abc_args
+    dfflibmap {*}$lib_args {*}$lib_dont_use_args
+    write_verilog -noexpr -noattr pre_retiming.v
+    design -stash new_gold
+
+    design -load $gate
+    abc -liberty /OpenROAD-flow-scripts/flow/platforms/sky130hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib -dont_use sky130_fd_sc_hd__probe_p_8 -dont_use sky130_fd_sc_hd__probec_p_8 -dont_use sky130_fd_sc_hd__lpflow_bleeder_1 -dont_use sky130_fd_sc_hd__lpflow_clkbufkapwr_1 -dont_use sky130_fd_sc_hd__lpflow_clkbufkapwr_16 -dont_use sky130_fd_sc_hd__lpflow_clkbufkapwr_2 -dont_use sky130_fd_sc_hd__lpflow_clkbufkapwr_4 -dont_use sky130_fd_sc_hd__lpflow_clkbufkapwr_8 -dont_use sky130_fd_sc_hd__lpflow_clkinvkapwr_1 -dont_use sky130_fd_sc_hd__lpflow_clkinvkapwr_16 -dont_use sky130_fd_sc_hd__lpflow_clkinvkapwr_2 -dont_use sky130_fd_sc_hd__lpflow_clkinvkapwr_4 -dont_use sky130_fd_sc_hd__lpflow_clkinvkapwr_8 -dont_use sky130_fd_sc_hd__lpflow_decapkapwr_12 -dont_use sky130_fd_sc_hd__lpflow_decapkapwr_3 -dont_use sky130_fd_sc_hd__lpflow_decapkapwr_4 -dont_use sky130_fd_sc_hd__lpflow_decapkapwr_6 -dont_use sky130_fd_sc_hd__lpflow_decapkapwr_8 -dont_use sky130_fd_sc_hd__lpflow_inputiso0n_1 -dont_use sky130_fd_sc_hd__lpflow_inputiso0p_1 -dont_use sky130_fd_sc_hd__lpflow_inputiso1n_1 -dont_use sky130_fd_sc_hd__lpflow_inputiso1p_1 -dont_use sky130_fd_sc_hd__lpflow_inputisolatch_1 -dont_use sky130_fd_sc_hd__lpflow_isobufsrc_1 -dont_use sky130_fd_sc_hd__lpflow_isobufsrc_16 -dont_use sky130_fd_sc_hd__lpflow_isobufsrc_2 -dont_use sky130_fd_sc_hd__lpflow_isobufsrc_4 -dont_use sky130_fd_sc_hd__lpflow_isobufsrc_8 -dont_use sky130_fd_sc_hd__lpflow_isobufsrckapwr_16 -dont_use sky130_fd_sc_hd__lpflow_lsbuf_lh_hl_isowell_tap_1 -dont_use sky130_fd_sc_hd__lpflow_lsbuf_lh_hl_isowell_tap_2 -dont_use sky130_fd_sc_hd__lpflow_lsbuf_lh_hl_isowell_tap_4 -dont_use sky130_fd_sc_hd__lpflow_lsbuf_lh_isowell_4 -dont_use sky130_fd_sc_hd__lpflow_lsbuf_lh_isowell_tap_1 -dont_use sky130_fd_sc_hd__lpflow_lsbuf_lh_isowell_tap_2 -dont_use sky130_fd_sc_hd__lpflow_lsbuf_lh_isowell_tap_4 -constr ./objects/sky130hd/aes/base/abc.constr -keepff -dff -script "+strash; zero; dretime -v; retime -M 5 -D 1 -o -v; map -D 1"
+    dfflibmap {*}$lib_args {*}$lib_dont_use_args
+    write_verilog -noexpr -noattr post_retiming.v
+    design -stash new_gate
+
     #puts "Create new modules"
-    design -copy-from $gold -as gold $top_module
-    design -copy-from $gate -as gate $top_module
+    design -copy-from new_gold -as gold $top_module
+    design -copy-from new_gate -as gate $top_module
 
     equiv_make -inames gold gate equiv
     yosys cd equiv
+
+    foreach lib $::env(LIB_FILES) {
+      yosys read_liberty -wb -ignore_miss_func $lib
+    }
     prep -flatten -top equiv
     opt_clean -purge
 
@@ -206,4 +220,3 @@ proc check_logical_equivalence {top_module gold gate abc_args lib_args lib_dont_
     puts "Restore the design"
     design -load backup_1
 }
-
