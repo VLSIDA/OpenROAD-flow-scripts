@@ -2,7 +2,7 @@
 
 current_design gcd
 
-set clk_period 3.41
+set clk_period 3.99
 set clk_io_pct 0.2
 set duty_cycle 0.49
 
