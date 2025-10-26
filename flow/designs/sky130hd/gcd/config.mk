@@ -4,6 +4,8 @@ export PLATFORM    = sky130hd
 export VERILOG_FILES = $(DESIGN_HOME)/src/$(DESIGN_NICKNAME)/gcd.v
 export SDC_FILE      = $(DESIGN_HOME)/$(PLATFORM)/$(DESIGN_NICKNAME)/two_phase_clk_constraint.sdc
 
+export ABC_RETIME_FOR_TWO_PHASE = 1
+
 # Adders degrade GCD
 export ADDER_MAP_FILE :=
 
