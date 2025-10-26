@@ -94,6 +94,8 @@ if { $::env(ABC_AREA) } {
   set abc_script $::env(SCRIPTS_DIR)/abc_speed.script
 }
 
+set abc_retime_script_for_two_phase $::env(SCRIPTS_DIR)/abc_retime_for_two_phase.script
+
 # Create argument list for stat
 set lib_args ""
 foreach lib $::env(LIB_FILES) {
@@ -112,6 +114,9 @@ if { [env_var_exists_and_non_empty DONT_USE_CELLS] } {
 # Technology mapping for cells
 set abc_args [list -script $abc_script \
   {*}$lib_args {*}$lib_dont_use_args -constr $::env(OBJECTS_DIR)/abc.constr]
+
+set abc_args_for_retiming [list -script $abc_retime_script_for_two_phase \
+  {*}$lib_args {*}$lib_dont_use_args -constr $::env(OBJECTS_DIR)/abc.constr -keepff -dff]
 
 if { [env_var_exists_and_non_empty SDC_FILE_CLOCK_PERIOD] } {
   puts "Extracting clock period from SDC file: $::env(SDC_FILE_CLOCK_PERIOD)"
@@ -184,22 +189,20 @@ proc connect_clk {cell_name clock_pin_name target_clk_port_name} {
 }
 
 proc check_logical_equivalence {top_module gold gate abc_args lib_args lib_dont_use_args} {
+    puts "Perform equivalence checking"
     puts "Save a backup that won't get deleted by this function"
     design -save backup_1
 
     design -load $gold
     abc {*}$abc_args
     dfflibmap {*}$lib_args {*}$lib_dont_use_args
-    write_verilog -noexpr -noattr pre_retiming.v
     design -stash new_gold
 
     design -load $gate
-    abc -liberty /OpenROAD-flow-scripts/flow/platforms/sky130hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib -dont_use sky130_fd_sc_hd__probe_p_8 -dont_use sky130_fd_sc_hd__probec_p_8 -dont_use sky130_fd_sc_hd__lpflow_bleeder_1 -dont_use sky130_fd_sc_hd__lpflow_clkbufkapwr_1 -dont_use sky130_fd_sc_hd__lpflow_clkbufkapwr_16 -dont_use sky130_fd_sc_hd__lpflow_clkbufkapwr_2 -dont_use sky130_fd_sc_hd__lpflow_clkbufkapwr_4 -dont_use sky130_fd_sc_hd__lpflow_clkbufkapwr_8 -dont_use sky130_fd_sc_hd__lpflow_clkinvkapwr_1 -dont_use sky130_fd_sc_hd__lpflow_clkinvkapwr_16 -dont_use sky130_fd_sc_hd__lpflow_clkinvkapwr_2 -dont_use sky130_fd_sc_hd__lpflow_clkinvkapwr_4 -dont_use sky130_fd_sc_hd__lpflow_clkinvkapwr_8 -dont_use sky130_fd_sc_hd__lpflow_decapkapwr_12 -dont_use sky130_fd_sc_hd__lpflow_decapkapwr_3 -dont_use sky130_fd_sc_hd__lpflow_decapkapwr_4 -dont_use sky130_fd_sc_hd__lpflow_decapkapwr_6 -dont_use sky130_fd_sc_hd__lpflow_decapkapwr_8 -dont_use sky130_fd_sc_hd__lpflow_inputiso0n_1 -dont_use sky130_fd_sc_hd__lpflow_inputiso0p_1 -dont_use sky130_fd_sc_hd__lpflow_inputiso1n_1 -dont_use sky130_fd_sc_hd__lpflow_inputiso1p_1 -dont_use sky130_fd_sc_hd__lpflow_inputisolatch_1 -dont_use sky130_fd_sc_hd__lpflow_isobufsrc_1 -dont_use sky130_fd_sc_hd__lpflow_isobufsrc_16 -dont_use sky130_fd_sc_hd__lpflow_isobufsrc_2 -dont_use sky130_fd_sc_hd__lpflow_isobufsrc_4 -dont_use sky130_fd_sc_hd__lpflow_isobufsrc_8 -dont_use sky130_fd_sc_hd__lpflow_isobufsrckapwr_16 -dont_use sky130_fd_sc_hd__lpflow_lsbuf_lh_hl_isowell_tap_1 -dont_use sky130_fd_sc_hd__lpflow_lsbuf_lh_hl_isowell_tap_2 -dont_use sky130_fd_sc_hd__lpflow_lsbuf_lh_hl_isowell_tap_4 -dont_use sky130_fd_sc_hd__lpflow_lsbuf_lh_isowell_4 -dont_use sky130_fd_sc_hd__lpflow_lsbuf_lh_isowell_tap_1 -dont_use sky130_fd_sc_hd__lpflow_lsbuf_lh_isowell_tap_2 -dont_use sky130_fd_sc_hd__lpflow_lsbuf_lh_isowell_tap_4 -constr ./objects/sky130hd/aes/base/abc.constr -keepff -dff -script "+strash; zero; dretime -v; retime -M 5 -D 1 -o -v; map -D 1"
     dfflibmap {*}$lib_args {*}$lib_dont_use_args
-    write_verilog -noexpr -noattr post_retiming.v
     design -stash new_gate
 
-    #puts "Create new modules"
+    puts "Create new modules"
     design -copy-from new_gold -as gold $top_module
     design -copy-from new_gate -as gate $top_module
 
