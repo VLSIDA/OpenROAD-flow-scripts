@@ -196,3 +196,7 @@ write_verilog -nohex -nodec $::env(RESULTS_DIR)/1_2_yosys.v
 # .sdc file after synthesis. For now, just copy the input .sdc file,
 # making synthesis more consistent with other stages.
 log_cmd exec cp $::env(SDC_FILE) $::env(RESULTS_DIR)/1_synth.sdc
+
+
+puts "Printing final stats"
+stat
