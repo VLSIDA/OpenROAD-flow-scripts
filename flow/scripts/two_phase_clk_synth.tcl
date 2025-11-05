@@ -1,3 +1,5 @@
+# This file is based on synth.tcl
+
 source $::env(SCRIPTS_DIR)/synth_preamble.tcl
 read_checkpoint $::env(RESULTS_DIR)/1_1_yosys_canonicalize.rtlil
 
