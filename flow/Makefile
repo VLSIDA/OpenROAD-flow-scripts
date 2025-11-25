@@ -505,6 +505,21 @@ cts: $(RESULTS_DIR)/4_cts.odb \
 
 # Run TritonCTS
 # ------------------------------------------------------------------------------
+ifeq ($(MODE), two_phase_clk)
+$(eval $(call do-step,4_1_cts,$(RESULTS_DIR)/3_place.odb $(RESULTS_DIR)/3_place.sdc,cts_build_1))
+
+$(eval $(call do-step,4_2_cts,$(RESULTS_DIR)/4_1_cts.odb $(RESULTS_DIR)/4_1_cts.sdc,cts_build_2))
+
+$(eval $(call do-step,4_3_cts,$(RESULTS_DIR)/4_2_cts.odb $(RESULTS_DIR)/4_2_cts.sdc,cts_checks))
+
+$(eval $(call do-copy,4_cts,4_3_cts.odb))
+
+.PHONY: do-cts
+do-cts:
+	$(UNSET_AND_MAKE) do-4_1_cts do-4_2_cts do-4_3_cts do-4_cts
+
+else
+
 $(eval $(call do-step,4_1_cts,$(RESULTS_DIR)/3_place.odb $(RESULTS_DIR)/3_place.sdc,cts))
 
 $(RESULTS_DIR)/4_cts.sdc: $(RESULTS_DIR)/4_cts.odb
@@ -514,6 +529,10 @@ $(eval $(call do-copy,4_cts,4_1_cts.odb))
 .PHONY: do-cts
 do-cts:
 	$(UNSET_AND_MAKE) do-4_1_cts do-4_cts
+
+endif
+
+$(RESULTS_DIR)/4_cts.sdc: $(RESULTS_DIR)/4_cts.odb
 
 .PHONY: clean_cts
 clean_cts:

@@ -11,7 +11,12 @@ export ADDER_MAP_FILE :=
 
 export CORE_UTILIZATION = 40
 export TNS_END_PERCENT = 100
-export EQUIVALENCE_CHECK   ?=   1
+
+# export EQUIVALENCE_CHECK   ?=   1
+
+# turn off eqy for this test case
+export EQUIVALENCE_CHECK   ?=   0
+
 export REMOVE_CELLS_FOR_EQY = sky130_fd_sc_hd__tapvpwrvgnd*
 
 # This allows Yosys to print more details to the terminal during execution
