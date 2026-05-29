@@ -6,6 +6,13 @@
 # R per length is computed as (resistivity [uOhm.cm] * 0.01) / (thickness [um])
 # divided by the minimum wire width, giving ohm / um. Capacitance is a rough
 # guess (no PEX data shipped in the ICT for these layers).
+#
+# WARNING: ALL VALUES BELOW ARE FAKE / PLACEHOLDER.
+# They are dimensional estimates only and are not calibrated against
+# silicon or a vendor extraction model. Use them to exercise the flow
+# (timing closure, IR drop sweeps, routing congestion) but do NOT treat
+# any number derived from them as physically meaningful. Replace with
+# values from a real RCX / QRC model before drawing conclusions.
 
 # Front-side routing
 set_layer_rc -layer M0  -resistance 259    -capacitance 1.5e-4
@@ -20,18 +27,25 @@ set_layer_rc -layer M8  -resistance   3.5  -capacitance 2.0e-4
 set_layer_rc -layer M9  -resistance   3.5  -capacitance 2.0e-4
 set_layer_rc -layer M10 -resistance   0.67 -capacitance 2.5e-4
 
-# Backside (no calibration data in ICT; estimate from layer dimensions)
+# Backside (fake values; ICT has no backside data, dimensions only)
 set_layer_rc -layer BPR -resistance  30    -capacitance 1.0e-4
 set_layer_rc -layer BM1 -resistance   5    -capacitance 1.5e-4
 set_layer_rc -layer BM2 -resistance   5    -capacitance 1.5e-4
 
-# Via resistances (rough)
+# Via resistances (fake; rough scaling vs. cut size)
 set_layer_rc -via V0 -resistance 10
 set_layer_rc -via V1 -resistance 10
 set_layer_rc -via V2 -resistance 8
 set_layer_rc -via V3 -resistance 8
 set_layer_rc -via V4 -resistance 5
 set_layer_rc -via V5 -resistance 5
+
+# Backside via resistances (fake; same scale as front-side V0..V4)
+set_layer_rc -via BV0 -resistance 10
+set_layer_rc -via BV1 -resistance 8
+set_layer_rc -via BV2 -resistance 8
+set_layer_rc -via BV3 -resistance 5
+set_layer_rc -via BV4 -resistance 5
 
 set_wire_rc -signal -layer M3
 set_wire_rc -clock  -layer M5
